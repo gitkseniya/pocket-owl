@@ -83,9 +83,9 @@ def localized_text(key, bot_language):
         return translations[bot_language][key]
     except KeyError:
         logging.warning(f"No translation available for bot_language code '{bot_language}' and key '{key}'")
-        # Fallback to English if the translation is not available
-        if key in translations['en']:
-            return translations['en'][key]
+        # Fallback to Russian if the translation is not available
+        if key in translations['ru']:
+            return translations['ru'][key]
         else:
             logging.warning(f"No english definition found for key '{key}' in translations.json")
             # return key as text
