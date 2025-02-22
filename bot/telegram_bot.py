@@ -1044,6 +1044,32 @@ class ChatGPTTelegramBot:
         await application.bot.set_my_commands(self.group_commands, scope=BotCommandScopeAllGroupChats())
         await application.bot.set_my_commands(self.commands)
 
+    async def family_const(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Handles the /family_const command, sending a custom systemic constellation prompt to OpenAI.
+        """
+        if not await is_allowed(self.config, update, context):
+            logging.warning(f'User {update.message.from_user.name} (id: {update.message.from_user.id}) '
+                            'is not allowed to use /family_const')
+            await self.send_disallowed_message(update, context)
+            return
+
+        user_input = update.message.text.replace("/family_const", "").strip()  # Get user input after the command
+
+        # Custom systemic constellation prompt
+        prompt = (
+            "Ты действуешь как Системный Расстановщик по Берту Хеллингеру, духовный учитель и отвечаешь на вопросы. "
+                "Отвечай нормальным человеческим языком, по стилю будь легким в ответах. "
+                "Обращайся к собеседнику на ты. "
+                "Отвечай в контексте системных расстановок."
+            "User input: " + user_input if user_input else "Please describe your situation."
+        )
+
+        response = await self.openai.get_chat_response(prompt, update.effective_chat.id)
+
+        await update.message.reply_text(response, parse_mode=constants.ParseMode.MARKDOWN)
+
+
     def run(self):
         """
         Runs the bot indefinitely until the user presses Ctrl+C
@@ -1063,6 +1089,7 @@ class ChatGPTTelegramBot:
         application.add_handler(CommandHandler('start', self.help))
         application.add_handler(CommandHandler('stats', self.stats))
         application.add_handler(CommandHandler('resend', self.resend))
+        application.add_handler(CommandHandler('family_const', self.family_const))
         application.add_handler(CommandHandler(
             'chat', self.prompt, filters=filters.ChatType.GROUP | filters.ChatType.SUPERGROUP)
         )
