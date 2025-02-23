@@ -1068,8 +1068,14 @@ class ChatGPTTelegramBot:
 
         # Send "typing..." action
         await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=constants.ChatAction.TYPING)
+        
+        # Log the user's question
+        logging.info(f'User {update.message.from_user.name} (id: {update.message.from_user.id}) '
+                f'asked a question in family_const chat: {user_input}')
+
 
         response = await self.openai.get_chat_response(query=prompt, chat_id=update.effective_chat.id)
+        logging.warning(f'OpenAI Response: {response}')
 
         await update.message.reply_text(text=response[0], parse_mode=constants.ParseMode.MARKDOWN)
 
