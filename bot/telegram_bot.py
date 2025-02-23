@@ -1062,12 +1062,16 @@ class ChatGPTTelegramBot:
                 "Отвечай нормальным человеческим языком, по стилю будь легким в ответах. "
                 "Обращайся к собеседнику на ты. "
                 "Отвечай в контексте системных расстановок."
+                "Отвечай коротко и ёмко."
             "User input: " + user_input if user_input else "Please describe your situation."
         )
 
-        response = await self.openai.get_chat_response(prompt, update.effective_chat.id)
+        # Send "typing..." action
+        await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=constants.ChatAction.TYPING)
 
-        await update.message.reply_text(response, parse_mode=constants.ParseMode.MARKDOWN)
+        response = await self.openai.get_chat_response(query=prompt, chat_id=update.effective_chat.id)
+
+        await update.message.reply_text(text=response[0], parse_mode=constants.ParseMode.MARKDOWN)
 
 
     def run(self):
